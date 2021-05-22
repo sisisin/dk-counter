@@ -22,7 +22,9 @@
   },
   "dependencies": {
     "electron-reload": "^1.5.0",
-    "parcel-bundler": "^1.12.5",
-    "sqlite3": "^5.0.2"
+    "electron-store": "^8.0.0",
+    "node-fetch": "^2.6.1",
+    "sqlite3": "^5.0.2",
+    "twit": "^2.2.11"
   }
 }

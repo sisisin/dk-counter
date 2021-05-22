@@ -19,4 +19,22 @@ window.addEventListener('DOMContentLoaded', () => {
     ipcRenderer.send('foo', e.target.files[0].path);
     e.target.value = '';
   });
+
+  const authorizeTwitterAnchor = document.querySelector('#authorize-twitter-anchor');
+  authorizeTwitterAnchor.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    ipcRenderer.send('clickTwitterAnchor');
+  });
+
+  const pinSubmit = document.querySelector('#pin-submit');
+  pinSubmit.addEventListener('click', () => {
+    const pinInput = document.querySelector('#twitter-pin');
+    const pin = pinInput.value;
+    ipcRenderer.send('authorizeTwitter', pin);
+  });
+
+  document.querySelector('#tweet-daken-count').addEventListener('click', () => {
+    ipcRenderer.send('tweet');
+  });
 });

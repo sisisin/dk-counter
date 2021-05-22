@@ -5,15 +5,18 @@ module.exports = { countTodayDaken };
 function countTodayDaken(scoreDBPath) {
   const db = new sqlite3.Database(scoreDBPath);
 
-  db.all(
-    `
-  select date(datetime(\`date\`, 'unixepoch'), 'localtime') dt ,sum(notes) from score
-  group by dt
-  ;`,
-    (err, rows) => {
-      console.log(rows);
+  return new Promise((resolve, reject) => {
+    db.all(
+      `
+    select date(datetime(\`date\`, 'unixepoch'), 'localtime') dt ,sum(notes) from score
+    group by dt
+    ;`,
+      (err, rows) => {
+        if (err) return reject(err);
 
-      db.close();
-    },
-  );
+        db.close();
+        resolve(rows);
+      },
+    );
+  });
 }

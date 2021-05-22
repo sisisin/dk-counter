@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 
 require('electron-reload')(path.join(__dirname));
@@ -32,8 +32,42 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
 
+const fetch = require('node-fetch');
+const Store = require('electron-store');
+
+const store = new Store();
 const { countTodayDaken } = require('./main-src/index');
+const endpoint = 'https://us-central1-daken-counter-4be99.cloudfunctions.net';
+
 ipcMain.on('foo', (event, arg) => {
-  console.log(event, arg);
-  countTodayDaken(arg);
+  store.set('oraja.scoredbPath', arg);
+});
+
+ipcMain.on('clickTwitterAnchor', () => {
+  shell.openExternal(`${endpoint}/twitter/auth`);
+});
+
+ipcMain.on('authorizeTwitter', async (event, arg) => {
+  const res = await fetch(`${endpoint}/twitter/auth/pin?pin=${arg}`).then((res) => res.json());
+  store.set('twitter', res);
+});
+
+ipcMain.on('tweet', async () => {
+  const { token, secret } = store.get('twitter');
+  const scoredbPath = store.get('oraja.scoredbPath');
+  const dakens = await countTodayDaken(scoredbPath);
+
+  const newest = dakens.pop();
+
+  fetch(`${endpoint}/twitter/tweet`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      accessToken: token,
+      accessSecret: secret,
+      message: `${newest.dt} の打鍵数は ${newest['sum(notes)']}`,
+    }),
+  });
 });
