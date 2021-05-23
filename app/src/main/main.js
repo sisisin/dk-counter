@@ -49,6 +49,7 @@ const client = new Client(endpoint, shell.openExternal, app.isPackaged, logger);
 
 ipcMain.on('foo', (event, arg) => {
   store.set('oraja.scoredbPath', arg);
+  event.reply('storeUpdated', getAppState());
 });
 
 ipcMain.on('clickTwitterAnchor', () => {
@@ -58,6 +59,7 @@ ipcMain.on('clickTwitterAnchor', () => {
 ipcMain.on('authorizeTwitter', async (event, arg) => {
   const res = await client.authorizeTwitter(arg);
   store.set('twitter', res);
+  event.reply('storeUpdated', getAppState());
 });
 
 ipcMain.on('tweet', async () => {
@@ -71,8 +73,12 @@ ipcMain.on('tweet', async () => {
 });
 
 ipcMain.handle('getStore', () => {
+  return getAppState();
+});
+
+function getAppState() {
   const twitter = store.get('twitter');
   const oraja = store.get('oraja');
 
   return { twitter, oraja };
-});
+}

@@ -1,78 +1,57 @@
 import React from 'react';
+import { Settings } from './Settings';
+import { TweetDakenCount } from './TweetDakenCount';
 
-export const App: React.FC = () => {
-  const pinInputRef = React.useRef<HTMLInputElement>(null);
-  const filenameInputRef = React.useRef<HTMLInputElement>(null);
-  const scoreDBInputRef = React.useRef<HTMLInputElement>(null);
-  const [authed, setAuthed] = React.useState(false);
+class Dispatcher {
+  constructor(private store: { dispatch: (eventType: string, ...args) => void }) {}
+  sendTwitterAnchorClicked() {
+    this.store.dispatch('clickTwitterAnchor');
+  }
+  sendAuthorizeTwitterClicked(pin) {
+    this.store.dispatch('authorizeTwitter', pin);
+  }
+  sendScoreDBPath(path) {
+    this.store.dispatch('foo', path);
+  }
+  sendTweetClicked() {
+    this.store.dispatch('tweet');
+  }
+}
 
-  const handlePinSubmit = (e) => {
-    const pin = pinInputRef.current.value;
-    appEvents.sendAuthorizeTwitterClicked(pin);
-  };
-
-  const handleScoreDBSet = () => {
-    const path = (scoreDBInputRef.current.files[0] as any)?.path;
-    scoreDBInputRef.current.value = '';
-
-    if (path) {
-      appEvents.sendScoreDBPath(path);
-      filenameInputRef.current.value = path;
-    }
-  };
-
-  const handleScoreDBSelect = () => {
-    scoreDBInputRef.current.click();
-  };
+const DispatcherContext = React.createContext<Dispatcher>(null);
+export function useDispatcher() {
+  return React.useContext(DispatcherContext);
+}
+function useMainState() {
+  const [state, setState] = React.useState<AppState>({ twitter: {}, oraja: {} });
 
   React.useEffect(() => {
-    (async () => {
-      const { oraja, twitter } = await appEvents.store.getState();
-      if (twitter.token && twitter.secret) {
-        setAuthed(true);
-      }
-      if (oraja.scoredbPath) {
-        filenameInputRef.current.value = oraja.scoredbPath;
-      }
-    })();
+    const unsubscribe = appEvents.store.subscribe((state) => {
+      setState(state);
+    });
+    appEvents.store.getState().then((state) => setState(state));
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
+
+  return state;
+}
+export type AppState = {
+  twitter: { token?: string; secret?: string };
+  oraja: {
+    scoredbPath?: string;
+  };
+};
+export const App: React.FC = () => {
+  const state = useMainState();
   return (
-    <div>
-      {!authed && (
-        <div>
-          <div>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                appEvents.sendTwitterAnchorClicked();
-              }}
-            >
-              authorize with twitter
-            </a>
-          </div>
-          <div>twitter pin</div>
-          <input name="twitter-pin" ref={pinInputRef} />
-          <button id="pin-submit" onClick={handlePinSubmit}>
-            submit
-          </button>
-        </div>
-      )}
-      score.db:
-      <input type="text" disabled ref={filenameInputRef} style={{ width: '600px' }}></input>
-      <input
-        type="file"
-        id="fileElem"
-        name="scoredb"
-        style={{ display: 'none' }}
-        ref={scoreDBInputRef}
-        onChange={handleScoreDBSet}
-      />
-      <button onClick={handleScoreDBSelect}>選択</button>
+    <DispatcherContext.Provider value={new Dispatcher(appEvents.store)}>
       <div>
-        <button onClick={() => appEvents.sendTweetClicked()}>tweet</button>
+        <Settings state={state}></Settings>
+        <TweetDakenCount></TweetDakenCount>
       </div>
-    </div>
+    </DispatcherContext.Provider>
   );
 };
