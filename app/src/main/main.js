@@ -34,10 +34,15 @@ app.on('window-all-closed', function () {
 
 const Store = require('electron-store');
 
-const store = new Store();
 const { countTodayDaken } = require('./score-db');
 const { Client } = require('./client');
 const { Logger } = require('./logger');
+const store = new Store({
+  defaults: {
+    twitter: {},
+    oraja: {},
+  },
+});
 const endpoint = 'https://us-central1-daken-counter-4be99.cloudfunctions.net';
 const logger = new Logger(app.isPackaged);
 const client = new Client(endpoint, shell.openExternal, app.isPackaged, logger);
@@ -56,11 +61,18 @@ ipcMain.on('authorizeTwitter', async (event, arg) => {
 });
 
 ipcMain.on('tweet', async () => {
-  const { token, secret } = store.get('twitter') ?? {};
+  const { token, secret } = store.get('twitter');
   const scoredbPath = store.get('oraja.scoredbPath');
   const dakens = await countTodayDaken(scoredbPath);
 
   const newest = dakens.pop();
 
   client.tweet(newest, token, secret);
+});
+
+ipcMain.handle('getStore', () => {
+  const twitter = store.get('twitter');
+  const oraja = store.get('oraja');
+
+  return { twitter, oraja };
 });

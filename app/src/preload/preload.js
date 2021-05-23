@@ -7,4 +7,7 @@ contextBridge.exposeInMainWorld('appEvents', {
   sendAuthorizeTwitterClicked: (pin) => ipcRenderer.send('authorizeTwitter', pin),
   sendScoreDBPath: (path) => ipcRenderer.send('foo', path),
   sendTweetClicked: () => ipcRenderer.send('tweet'),
+  store: {
+    getState: () => ipcRenderer.invoke('getStore'),
+  },
 });

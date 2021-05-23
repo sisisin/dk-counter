@@ -9,7 +9,7 @@
     "dist": "yarn build-renderer && electron-builder",
     "build": "yarn build-renderer",
     "build-renderer": "vite build ./src/renderer -r ./src --outDir ../renderer-dist --base ./ --emptyOutDir",
-    "watch": "yarn build-renderer -w"
+    "watch": "yarn build-renderer -w --sourcemap"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [],
