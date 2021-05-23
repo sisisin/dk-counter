@@ -5,8 +5,11 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron --inspect .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "pack": "yarn build && electron-builder --dir",
+    "dist": "yarn build-renderer && electron-builder",
+    "build": "yarn build-renderer",
+    "build-renderer": "vite build ./src/renderer -r ./src --outDir ../renderer-dist --base ./ --emptyOutDir",
+    "watch": "yarn build-renderer -w"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [],
@@ -14,7 +17,9 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^12.0.8",
-    "electron-builder": "^22.10.5"
+    "electron-builder": "^22.10.5",
+    "typescript": "^4.2.4",
+    "vite": "^2.3.3"
   },
   "dependencies": {
     "electron-store": "^8.0.0",
