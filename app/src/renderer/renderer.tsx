@@ -1,5 +1,18 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { App } from './App';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root'),
+);
+
+declare const appEvents;
+
 window.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('#scoredb').addEventListener('change', (e) => {
+  document.querySelector('#scoredb').addEventListener('change', (e: any) => {
     appEvents.sendScoreDBPath(e.target.files[0].path);
     e.target.value = '';
   });
@@ -11,8 +24,8 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   document.querySelector('#pin-submit').addEventListener('click', () => {
-    const pinInput = document.querySelector('#twitter-pin');
-    const pin = pinInput.value;
+    const pin = (document.querySelector('#twitter-pin') as HTMLInputElement).value;
+
     appEvents.sendAuthorizeTwitterClicked(pin);
   });
 

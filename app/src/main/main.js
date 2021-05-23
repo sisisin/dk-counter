@@ -11,7 +11,7 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile('src/renderer/index.html');
+  mainWindow.loadFile('src/renderer-dist/index.html');
 
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
