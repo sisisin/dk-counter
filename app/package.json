@@ -2,7 +2,7 @@
   "name": "daken-counter",
   "version": "0.0.1",
   "description": "beatorajaでの本日の打鍵数をつぶやく",
-  "main": "main.js",
+  "main": "src/main/main.js",
   "scripts": {
     "start": "electron --inspect .",
     "pack": "electron-builder --dir",

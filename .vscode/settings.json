@@ -1,0 +1,7 @@
+{
+  "search.exclude": {
+    "**/dist": true,
+    "**/tmp": true
+  },
+  "cSpell.words": ["Daken", "oraja"]
+}
