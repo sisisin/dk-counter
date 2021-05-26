@@ -1,11 +1,12 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const packageJson = require('../../package.json');
 
+let mainWindow;
 function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     title: `daken-counter v${packageJson.version}`,
@@ -21,6 +22,18 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 }
+
+autoUpdater.on('update-downloaded', async (info) => {
+  const opts = {
+    type: 'info',
+    buttons: ['更新して再起動'],
+    message: 'アップデート',
+    detail: '新しいバージョンをダウンロードしました。再起動して更新を適用します',
+  };
+
+  await dialog.showMessageBox(mainWindow, opts);
+  autoUpdater.quitAndInstall();
+});
 
 app.whenReady().then(() => {
   createWindow();

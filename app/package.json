@@ -1,12 +1,12 @@
 {
   "name": "daken-counter",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "beatorajaでの本日の打鍵数をつぶやく",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron --inspect .",
     "pack": "yarn build && electron-builder --dir",
-    "dist": "yarn build-renderer && electron-builder",
+    "dist": "yarn build && electron-builder",
     "build": "yarn build-renderer",
     "build-renderer": "vite build ./src/renderer -r ./src --outDir ../renderer-dist --base ./ --emptyOutDir",
     "watch": "yarn build-renderer -w --sourcemap",
