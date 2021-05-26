@@ -1,6 +1,9 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, shell, ipcRenderer } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
+const { autoUpdater } = require('electron-updater');
+
+autoUpdater.checkForUpdatesAndNotify();
 
 function createWindow() {
   const mainWindow = new BrowserWindow({

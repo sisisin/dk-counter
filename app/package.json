@@ -9,9 +9,10 @@
     "dist": "yarn build-renderer && electron-builder",
     "build": "yarn build-renderer",
     "build-renderer": "vite build ./src/renderer -r ./src --outDir ../renderer-dist --base ./ --emptyOutDir",
-    "watch": "yarn build-renderer -w --sourcemap"
+    "watch": "yarn build-renderer -w --sourcemap",
+    "release": "yarn build && electron-builder"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/sisisin/dk-counter",
   "keywords": [],
   "author": "sisisin",
   "license": "MIT",
@@ -28,6 +29,7 @@
   },
   "dependencies": {
     "electron-store": "^8.0.0",
+    "electron-updater": "^4.3.9",
     "node-fetch": "^2.6.1",
     "sqlite3": "^5.0.2",
     "twit": "^2.2.11"
