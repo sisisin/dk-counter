@@ -3,8 +3,6 @@ const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 
-autoUpdater.checkForUpdatesAndNotify();
-
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -30,6 +28,8 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 app.on('window-all-closed', function () {
