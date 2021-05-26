@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 
-module.exports = { countTodayDaken };
+module.exports = { countTodayDaken, getDakenCountBy };
 
 function countTodayDaken(scoreDBPath) {
   const db = new sqlite3.Database(scoreDBPath);
@@ -8,15 +8,40 @@ function countTodayDaken(scoreDBPath) {
   return new Promise((resolve, reject) => {
     db.all(
       `
-    select date(datetime(\`date\`, 'unixepoch'), 'localtime') dt ,sum(notes) from score
+    select date(datetime(\`date\`, 'unixepoch'), 'localtime') dt ,sum(notes) noteCount from score
     group by dt
     ;`,
       (err, rows) => {
         if (err) return reject(err);
 
-        db.close();
         resolve(rows);
       },
     );
+  }).finally(() => {
+    db.close();
+  });
+}
+
+function getDakenCountBy(scoreDBPath, { from, to }) {
+  const db = new sqlite3.Database(scoreDBPath);
+  db.on('profile', (sql) => {
+    console.log(sql);
+  });
+
+  return new Promise((resolve, reject) => {
+    db.get(
+      `
+    select date(datetime(\`date\`, 'unixepoch'), 'localtime') dakenDate ,sum(notes) noteCount
+    from score
+    where dakenDate between ? and ?`,
+      [from.toISOString(), to.toISOString()],
+      (err, row) => {
+        if (err) return reject(err);
+        console.log(row);
+        resolve(row);
+      },
+    );
+  }).finally(() => {
+    db.close();
   });
 }

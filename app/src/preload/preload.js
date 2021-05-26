@@ -8,6 +8,10 @@ ipcRenderer.on('storeUpdated', (event, state) => {
 });
 
 contextBridge.exposeInMainWorld('appEvents', {
+  client: {
+    fetch: (...args) => ipcRenderer.invoke(...args),
+    getDakenCountBy: ({ from, to }) => ipcRenderer.invoke('getDakenCountBy', { from, to }),
+  },
   sendTweetClicked: () => ipcRenderer.send('tweet'),
   store: {
     dispatch(eventType, ...args) {

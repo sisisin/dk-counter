@@ -15,11 +15,11 @@ class Client {
     return fetch(`${this.endpoint}/twitter/auth/pin?pin=${pin}`).then((res) => res.json());
   }
 
-  tweet(newest, token, secret) {
+  tweet(message, token, secret) {
     const body = {
       accessToken: token,
       accessSecret: secret,
-      message: `${newest.dt} の打鍵数は ${newest['sum(notes)']}`,
+      message,
     };
     this.logger.log(body);
 

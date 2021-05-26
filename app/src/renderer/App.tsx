@@ -13,11 +13,22 @@ class Dispatcher {
   sendScoreDBPath(path) {
     this.store.dispatch('foo', path);
   }
-  sendTweetClicked() {
-    this.store.dispatch('tweet');
+  sendTweetClicked(message: string) {
+    this.store.dispatch('tweet', message);
   }
 }
 
+class Client {
+  constructor(private fetch: <T>(eventType: string, ...args) => Promise<T>) {}
+
+  getDakenCountBy({ from, to }) {
+    return this.fetch('getDakenCountBy', { from, to });
+  }
+}
+const ClientContext = React.createContext<Client>(null);
+export function useClient() {
+  return React.useContext(ClientContext);
+}
 const DispatcherContext = React.createContext<Dispatcher>(null);
 export function useDispatcher() {
   return React.useContext(DispatcherContext);
@@ -47,11 +58,13 @@ export type AppState = {
 export const App: React.FC = () => {
   const state = useMainState();
   return (
-    <DispatcherContext.Provider value={new Dispatcher(appEvents.store)}>
-      <div>
-        <Settings state={state}></Settings>
-        <TweetDakenCount></TweetDakenCount>
-      </div>
-    </DispatcherContext.Provider>
+    <ClientContext.Provider value={new Client(appEvents.client.fetch)}>
+      <DispatcherContext.Provider value={new Dispatcher(appEvents.store)}>
+        <div>
+          <Settings state={state}></Settings>
+          <TweetDakenCount></TweetDakenCount>
+        </div>
+      </DispatcherContext.Provider>
+    </ClientContext.Provider>
   );
 };

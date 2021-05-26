@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, ipcRenderer } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -34,7 +34,7 @@ app.on('window-all-closed', function () {
 
 const Store = require('electron-store');
 
-const { countTodayDaken } = require('./score-db');
+const { countTodayDaken, getDakenCountBy } = require('./score-db');
 const { Client } = require('./client');
 const { Logger } = require('./logger');
 const store = new Store({
@@ -62,18 +62,19 @@ ipcMain.on('authorizeTwitter', async (event, arg) => {
   event.reply('storeUpdated', getAppState());
 });
 
-ipcMain.on('tweet', async () => {
+ipcMain.on('tweet', async (event, message) => {
   const { token, secret } = store.get('twitter');
-  const scoredbPath = store.get('oraja.scoredbPath');
-  const dakens = await countTodayDaken(scoredbPath);
-
-  const newest = dakens.pop();
-
-  client.tweet(newest, token, secret);
+  client.tweet(message, token, secret);
 });
 
 ipcMain.handle('getStore', () => {
   return getAppState();
+});
+
+ipcMain.handle('getDakenCountBy', (event, { from, to }) => {
+  const scoredbPath = store.get('oraja.scoredbPath');
+
+  return getDakenCountBy(scoredbPath, { from, to });
 });
 
 function getAppState() {
