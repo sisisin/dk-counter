@@ -1,6 +1,6 @@
 {
   "name": "daken-counter",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "beatorajaでの本日の打鍵数をつぶやく",
   "main": "src/main/main.js",
   "scripts": {
