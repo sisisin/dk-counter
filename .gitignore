@@ -3,3 +3,4 @@ tmp
 .envrc
 dist
 renderer-dist
+.runtimeconfig.json
