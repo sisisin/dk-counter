@@ -2,11 +2,13 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
+const packageJson = require('../../package.json');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    title: `daken-counter v${packageJson.version}`,
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
     },
