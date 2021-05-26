@@ -14,6 +14,7 @@ function createWindow() {
     },
   });
 
+  mainWindow.setMenu(null);
   mainWindow.loadFile('src/renderer-dist/index.html');
 
   if (!app.isPackaged) {
