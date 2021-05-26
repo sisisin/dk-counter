@@ -16,12 +16,15 @@ class Dispatcher {
   sendTweetClicked(message: string) {
     this.store.dispatch('tweet', message);
   }
+  tweetTemplateSaveRequested(template: string) {
+    this.store.dispatch('tweetTemplateSaveRequested', template);
+  }
 }
 
 class Client {
   constructor(private fetch: <T>(eventType: string, ...args) => Promise<T>) {}
 
-  getDakenCountBy({ from, to }) {
+  getDakenCountBy({ from, to }: { from: Date; to: Date }) {
     return this.fetch('getDakenCountBy', { from, to });
   }
 }
@@ -34,7 +37,7 @@ export function useDispatcher() {
   return React.useContext(DispatcherContext);
 }
 function useMainState() {
-  const [state, setState] = React.useState<AppState>({ twitter: {}, oraja: {} });
+  const [state, setState] = React.useState<AppState>({ twitter: {}, oraja: {}, dakenCountTemplate: '' });
 
   React.useEffect(() => {
     const unsubscribe = appEvents.store.subscribe((state) => {
@@ -54,6 +57,7 @@ export type AppState = {
   oraja: {
     scoredbPath?: string;
   };
+  dakenCountTemplate: string;
 };
 export const App: React.FC = () => {
   const state = useMainState();
@@ -62,7 +66,7 @@ export const App: React.FC = () => {
       <DispatcherContext.Provider value={new Dispatcher(appEvents.store)}>
         <div>
           <Settings state={state}></Settings>
-          <TweetDakenCount></TweetDakenCount>
+          <TweetDakenCount dakenCountTemplate={state.dakenCountTemplate}></TweetDakenCount>
         </div>
       </DispatcherContext.Provider>
     </ClientContext.Provider>

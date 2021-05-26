@@ -60,6 +60,7 @@ const store = new Store({
   defaults: {
     twitter: {},
     oraja: {},
+    dakenCountTemplate: '%daken_time%は%daken_count%ノーツ叩いた',
   },
 });
 const endpoint = 'https://us-central1-daken-counter-4be99.cloudfunctions.net';
@@ -81,6 +82,11 @@ ipcMain.on('authorizeTwitter', async (event, arg) => {
   event.reply('storeUpdated', getAppState());
 });
 
+ipcMain.on('tweetTemplateSaveRequested', (event, template) => {
+  store.set('dakenCountTemplate', template);
+  event.reply('storeUpdated', getAppState());
+});
+
 ipcMain.on('tweet', async (event, message) => {
   const { token, secret } = store.get('twitter');
   client.tweet(message, token, secret);
@@ -99,6 +105,6 @@ ipcMain.handle('getDakenCountBy', (event, { from, to }) => {
 function getAppState() {
   const twitter = store.get('twitter');
   const oraja = store.get('oraja');
-
-  return { twitter, oraja };
+  const dakenCountTemplate = store.get('dakenCountTemplate');
+  return { twitter, oraja, dakenCountTemplate };
 }
