@@ -14,6 +14,9 @@ function formatDakenTime(from: Date, to: Date) {
   return `${formatter.format(from)} - ${formatter.format(to)}`;
 }
 function formatForInput(d: Date) {
+  if (d.toString() === 'Invalid Date') {
+    return '';
+  }
   const shift = d.getTime() + 9 * 60 * 60 * 1000;
   return new Date(shift).toISOString().split('.')[0];
 }
@@ -26,6 +29,30 @@ function getDefaultPeriod() {
   return { from: startOfToday, to: endOfToday };
 }
 
+function usePeriod() {
+  const initialPeriod = getDefaultPeriod();
+  const [pureFrom, setPureFrom] = React.useState(initialPeriod.from);
+  const [pureTo, setPureTo] = React.useState(initialPeriod.to);
+
+  const from = pureFrom.toString() === 'Invalid Date' ? initialPeriod.from : pureFrom;
+  const to = pureTo.toString() === 'Invalid Date' ? initialPeriod.to : pureTo;
+
+  return {
+    data: {
+      from,
+      setFrom: (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPureFrom(new Date(e.target.value));
+      },
+      to,
+      setTo: (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPureTo(new Date(e.target.value));
+      },
+    },
+    view: { from: formatForInput(pureFrom), to: formatForInput(pureTo) },
+    dakenTime: formatDakenTime(from, to),
+  };
+}
+
 export const TweetDakenCount: React.FC<{ dakenCountTemplate: string }> = ({ dakenCountTemplate }) => {
   const textRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -33,24 +60,15 @@ export const TweetDakenCount: React.FC<{ dakenCountTemplate: string }> = ({ dake
   const client = useClient();
   const [dakenCount, setDakenCount] = React.useState(null);
   const [tweetText, setTweetText] = React.useState(null);
-  const defaultPeriod = getDefaultPeriod();
-  const [from, setFrom] = React.useState(defaultPeriod.from);
-  const [to, setTo] = React.useState(defaultPeriod.to);
-
-  React.useEffect(() => {
-    if (dakenCount) {
-      const template = textRef.current.value;
-      const replaced = template
-        .replace('%daken_count%', dakenCount.noteCount)
-        .replace('%daken_time%', formatDakenTime(from, to));
-      setTweetText(replaced);
-    }
-  }, [dakenCount]);
+  const { data, view, dakenTime } = usePeriod();
 
   const fetchDakenCount = async () => {
     dispatcher.tweetTemplateSaveRequested(textRef.current.value);
-    const res = await client.getDakenCountBy({ from, to });
+    const res = await client.getDakenCountBy({ from: data.from, to: data.to });
     setDakenCount(res);
+    const template = textRef.current.value;
+    const replaced = template.replace('%daken_count%', `${res.noteCount}`).replace('%daken_time%', dakenTime);
+    setTweetText(replaced);
   };
 
   return (
@@ -60,24 +78,12 @@ export const TweetDakenCount: React.FC<{ dakenCountTemplate: string }> = ({ dake
       <div>
         打鍵タイム
         <div>
-          開始:{' '}
-          <input
-            onChange={(e) => setFrom(new Date(e.target.value))}
-            value={formatForInput(from)}
-            type="datetime-local"
-            name="from"
-          ></input>
+          開始: <input onChange={data.setFrom} value={view.from} type="datetime-local" name="from"></input>
         </div>
         <div>
-          終了:{' '}
-          <input
-            onChange={(e) => setTo(new Date(e.target.value))}
-            value={formatForInput(to)}
-            type="datetime-local"
-            name="to"
-          ></input>
+          終了: <input onChange={data.setTo} value={view.to} type="datetime-local" name="to"></input>
         </div>
-        <div>daken_time: {formatDakenTime(from, to)}</div>
+        <div>daken_time: {dakenTime}</div>
       </div>
       <hr></hr>
       <div>

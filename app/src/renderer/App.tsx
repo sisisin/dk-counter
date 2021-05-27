@@ -25,7 +25,7 @@ class Client {
   constructor(private fetch: <T>(eventType: string, ...args) => Promise<T>) {}
 
   getDakenCountBy({ from, to }: { from: Date; to: Date }) {
-    return this.fetch('getDakenCountBy', { from, to });
+    return this.fetch<{ dakenDate: string; noteCount: number }>('getDakenCountBy', { from, to });
   }
 }
 const ClientContext = React.createContext<Client>(null);
