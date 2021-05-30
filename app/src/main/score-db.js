@@ -30,7 +30,7 @@ function getDakenCountBy(scoreDBPath, { from, to }) {
       `
     select date(datetime(\`date\`, 'unixepoch'), 'localtime') dakenDate ,sum(notes) noteCount
     from score
-    where dakenDate between ? and ?`,
+    where date between ? and ?`,
       [from.getTime() / 1000, to.getTime() / 1000],
       (err, row) => {
         if (err) return reject(err);
